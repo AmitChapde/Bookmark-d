@@ -1,4 +1,4 @@
-import { Request,Response,NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { register, login } from "../services/auth.service";
 import { LoginInput, RegisterInput } from "../types/user.types";
 import User from "../models/user.model";
@@ -8,10 +8,11 @@ import { JWT_SECRET } from "../config/env";
 
 const registerController = async (
   req: Request<{}, {}, RegisterInput>,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const newUser = await register(req.body);
+    console.log(req.body);
     res.status(201).json({
       status: "success",
       data: {
@@ -29,7 +30,7 @@ const registerController = async (
 
 const loginController = async (
   req: Request<{}, {}, LoginInput>,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const user = await login(req.body);
@@ -52,43 +53,33 @@ const loginController = async (
 const protectController = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   let token;
   try {
-    //getting token and check if its present
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
+    if (req.headers.authorization?.startsWith("Bearer")) {
       token = req.headers.authorization.split(" ")[1];
     }
+
     if (!token) {
-      res
-        .status(401)
-        .json({ message: "you are not logged in login to get access" });
+      res.status(401).json({ message: "You are not logged in." });
       return;
     }
 
-    //verify token
-    const verifyAsync = promisify(jwt.verify as any);
-    const decoded = await verifyAsync(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET!) as JwtPayload;
 
-    //check if users still exists
     const freshUser = await User.findById(decoded.id);
     if (!freshUser) {
-      res
-        .status(401)
-        .json({ message: "the user belonging to this token no longer exists" });
+      res.status(401).json({ message: "The user no longer exists." });
       return;
-    }2
-   
+    }
+
     req.user = freshUser;
     next();
   } catch (error) {
-    res.status(500).json({ message: "Invalid or Expired Token" });
+    res.status(401).json({ message: "Invalid or Expired Token" });
     return;
   }
 };
 
-export {loginController,registerController,protectController}
+export { loginController, registerController, protectController };

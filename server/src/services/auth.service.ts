@@ -18,7 +18,7 @@ const register = async (data: RegisterInput) => {
   await newUser.save();
   return {
     id: newUser._id,
-    token,
+    token,    
     name: newUser.name,
     email: newUser.email,
   };

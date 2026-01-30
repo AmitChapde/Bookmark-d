@@ -68,6 +68,17 @@ const getBookByIdController = async (req: Request, res: Response) => {
       return;
     }
     const book = await getBookById(bookId, req.user._id.toString());
+
+    if (!book) {
+      return res.status(400).json({
+        status: "failure",
+        message: "Book not Found",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      data: book,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching Book" });
   }
@@ -109,7 +120,7 @@ const deleteBookController = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(204);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({
       status: "error",
