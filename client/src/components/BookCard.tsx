@@ -16,24 +16,37 @@ export default function BookCard({
   book,
   onUpdate,
   onDelete,
+  onShowToast,
 }: {
   book: Book;
   onUpdate: (book: Book) => void;
   onDelete: (id: string) => void;
+  onShowToast?: (message: string, type: "success" | "error") => void;
 }) {
   const handleStatusChange = async (status: BookStatus) => {
-    const data = await apiFetch(`/books/${book._id}`, {
-      method: "PATCH",
-      body: JSON.stringify({ status }),
-    });
-    onUpdate(data.data);
+    try {
+      const data = await apiFetch(`/books/${book._id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      });
+      onUpdate(data.data);
+      onShowToast?.("Status updated successfully", "success");
+    } catch (error: any) {
+      onShowToast?.(error.message || "Failed to update status", "error");
+    }
   };
 
   const handleDelete = async () => {
-    await apiFetch(`/books/${book._id}`, {
-      method: "DELETE",
-    });
-    onDelete(book._id);
+    try {
+      await apiFetch(`/books/${book._id}`, {
+        method: "DELETE",
+      });
+
+      onShowToast?.("Book deleted successfully", "success");
+      onDelete(book._id);
+    } catch (error: any) {
+      onShowToast?.(error.message || "Failed to delete book", "error");
+    }
   };
 
   return (

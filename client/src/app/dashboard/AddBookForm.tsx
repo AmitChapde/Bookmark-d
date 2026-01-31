@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { Plus, X, BookOpen, User, Tag } from "lucide-react";
+import { useToast } from "@/hooks/useToast";
+import Toast from "@/components/ui/Toast";
 import type { Book } from "@/types";
 
 export default function AddBookForm({
@@ -15,11 +17,15 @@ export default function AddBookForm({
   const [author, setAuthor] = useState("");
   const [tags, setTags] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { toast, showToast, hideToast } = useToast();
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !author) return;
+    if (!title || !author) {
+      showToast("Title and author are required", "error");
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -38,8 +44,9 @@ export default function AddBookForm({
       setAuthor("");
       setTags("");
       setIsOpen(false);
-    } catch (error) {
-      console.error("Failed to add book:", error);
+      showToast("Book added successfully", "success");
+    } catch (error: any) {
+      showToast(error.message || "Failed to add book", "error");
     } finally {
       setIsLoading(false);
     }
@@ -47,7 +54,15 @@ export default function AddBookForm({
 
   return (
     <>
-      {/* Modal Overlay */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          duration={toast.duration}
+          onClose={hideToast}
+        />
+      )}
+   
       {isOpen && (
         <div className="modal-overlay" onClick={() => setIsOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -119,7 +134,7 @@ export default function AddBookForm({
         </div>
       )}
 
-      {/* Add Book Button */}
+    
       <button
         type="button"
         className="add-book-btn"

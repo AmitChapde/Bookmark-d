@@ -1,18 +1,22 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { apiFetch } from "@/lib/api";
 import DashboardStats from "./DashboardStats";
 import BookList from "./BookList";
 import FilterBar from "./FilterBar";
 import AddBookForm from "./AddBookForm";
+import { useToast } from "@/hooks/useToast";
+import Toast from "@/components/ui/Toast";
 import type { Book, BookStatus } from "@/types";
 
 export default function DashboardPage() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { toast, showToast, hideToast } = useToast();
 
   const [books, setBooks] = useState<Book[]>([]);
   const [fetching, setFetching] = useState(true);
@@ -20,6 +24,15 @@ export default function DashboardPage() {
   // Filter state
   const [statusFilter, setStatusFilter] = useState<BookStatus | "">("");
   const [tagFilter, setTagFilter] = useState("");
+
+  // Show login success toast
+  useEffect(() => {
+    if (searchParams.get("loggedIn") === "true") {
+      showToast("Welcome back! You're now logged in.", "success");
+      // Remove the query param from URL without reload
+      router.replace("/dashboard", { scroll: false });
+    }
+  }, [searchParams, showToast, router]);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -59,6 +72,15 @@ export default function DashboardPage() {
 
   return (
     <main className="dashboard-container">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          duration={toast.duration}
+          onClose={hideToast}
+        />
+      )}
+
       <DashboardStats books={books} />
 
       <FilterBar
@@ -77,6 +99,7 @@ export default function DashboardPage() {
           )
         }
         onDelete={(id) => setBooks((prev) => prev.filter((b) => b._id !== id))}
+        onShowToast={showToast}
       />
 
       <AddBookForm
