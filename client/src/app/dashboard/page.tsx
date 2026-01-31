@@ -12,6 +12,9 @@ import { useToast } from "@/hooks/useToast";
 import Toast from "@/components/ui/Toast";
 import type { Book, BookStatus } from "@/types";
 
+// Prevent prerendering for this page since it requires authentication
+export const dynamic = "force-dynamic";
+
 export default function DashboardPage() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
