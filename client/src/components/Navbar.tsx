@@ -34,10 +34,10 @@ export default function Navbar() {
           </>
         ) : (
           <>
-            <Link href="/login" className="text-lg font-semibold">
+            <Link href="/login" className="text-sm font-semibold border-2 rounded-lg px-4 py-2 text-white border-blue-600 hover:bg-blue-600 cursor-pointer">
               Login
             </Link>
-            <Link href="/register" className="text-lg font-semibold">
+            <Link href="/register" className="text-sm font-semibold border-2 rounded-lg px-4 py-2 text-white border-green-600 hover:bg-green-600 cursor-pointer">
               Register
             </Link>
           </>

@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
   const { toast, showToast, hideToast } = useToast();
@@ -23,6 +24,11 @@ export default function RegisterPage() {
 
     if (!name || !email || !password || !confirmPassword) {
       showToast("Please fill in all required details", "error");
+      return;
+    }
+
+    if(password.length < 6){
+      showToast("Password must be at least 6 characters long", "error");
       return;
     }
 
@@ -39,7 +45,7 @@ export default function RegisterPage() {
         body: JSON.stringify({ name, email, password }),
       });
 
-      showToast("Account created successfully. Please login.", "success");
+      
       router.push("/login");
     } catch (error: any) {
       showToast(error.message || "Registering user failed", "error");
@@ -101,6 +107,14 @@ export default function RegisterPage() {
               required
               className="w-full px-3 py-2 border rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
         </div>
 
@@ -109,7 +123,7 @@ export default function RegisterPage() {
           <label className="text-sm font-medium">Confirm Password</label>
           <div className="relative">
             <input
-              type={showPassword ? "text" : "password"}
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm your password"
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
@@ -119,10 +133,10 @@ export default function RegisterPage() {
             <button
               type="button"
               disabled={loading}
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
         </div>
@@ -130,7 +144,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 bg-blue-700 text-white py-2 rounded-md font-medium hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-sm font-semibold border-2 rounded-lg px-4 py-2 text-black border-green-600 hover:bg-green-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Creating..." : "Register"}
         </button>

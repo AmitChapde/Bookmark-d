@@ -25,6 +25,11 @@ export default function LoginPage() {
       return;
     }
 
+    if (password.length < 6) {
+      showToast("Password must be at least 6 characters long", "error");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -40,7 +45,7 @@ export default function LoginPage() {
       login(data.data.token, { ...data.data.user });
       router.push("/dashboard?loggedIn=true");
     } catch (error: any) {
-      showToast(error.message || "Login failed", "error");
+      showToast("Login failed,Please try again Later", "error");
     } finally {
       setLoading(false);
     }
@@ -98,7 +103,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 bg-blue-700 text-white py-2 rounded-md font-medium hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-sm font-semibold border-2 rounded-lg px-4 py-2 text-black border-blue-600 hover:bg-blue-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Loading..." : "Submit"}
         </button>
